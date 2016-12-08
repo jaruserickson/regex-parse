@@ -8,11 +8,13 @@ def recentIndex(list, char, index):
 			return i
 	return -1
 
-def nextIndex(list, char, index):
-	#return next index of 'char' going forwards from index
-	for i in range(index, len(list)):
-		if list[i] == char:
-			return i
+def getIndexes(word, char):
+	#returns a list of the indexes of the chars i the wlord
+	indexes = []
+	for i in range(len(word)):
+		if word[i] == char:
+			indexes.append(i)
+	return indexes
 
 def bracketCheck(outList, chkList, message, i):
 	#checks back for recent bracket, and inserts message at appropriate indexes.
@@ -26,7 +28,7 @@ def bracketCheck(outList, chkList, message, i):
 	else:
 		outList.insert(i-1, message)
 
-def parseRegex(regex, outputType):
+def parseEnglish(regex):
 	#need to have a getlastindex for the opening bracket when a closing bracket is found
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
 
@@ -36,71 +38,50 @@ def parseRegex(regex, outputType):
 	for x in regex: #adding symbols to a list
 		symbols.append(x)
 
-	if outputType.lower() in ENGLISH:
-		#need some sort of grammar control here
-		for i in range(len(symbols)):
-			if symbols[i] == REGEX_OP[0]: #openbracket
-				out.append("( ")
-			elif symbols[i] == REGEX_OP[1]: #endbracket
-				out.append(") ")
-			elif symbols[i] == REGEX_OP[2]: #or
-				out.append("or ")
-			elif symbols[i] == REGEX_OP[3]: #any of
-				bracketCheck(out, symbols, "any word of ", i)
-			elif symbols[i] == REGEX_OP[4]: #concatenation
-				out.append("concatenated with ")
-			elif symbols[i] == REGEX_OP[5]: #optionally, not sure
-				bracketCheck(out, symbols, "optionally, ", i)
-			elif symbols[i].isalpha():
-				out.append(symbols[i] + " ")
+	#need some sort of grammar control here
+	for i in range(len(symbols)):
+		if symbols[i] == REGEX_OP[0]: #openbracket
+			out.append("( ")
+		elif symbols[i] == REGEX_OP[1]: #endbracket
+			out.append(") ")
+		elif symbols[i] == REGEX_OP[2]: #or
+			out.append("or ")
+		elif symbols[i] == REGEX_OP[3]: #any of
+			bracketCheck(out, symbols, "any word of ", i)
+		elif symbols[i] == REGEX_OP[4]: #concatenation
+			out.append("concatenated with ")
+		elif symbols[i] == REGEX_OP[5]: #optionally, not sure
+			bracketCheck(out, symbols, "optionally, ", i)
+		elif symbols[i].isalpha():
+			out.append(symbols[i] + " ")
 
 	return out
 
 def parseExample(regex):
-	#create an example.
+	#create a random example
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
+	#BEDMAS
+	OPEN_BR = getIndexes(regex, "(")
+	CLOSE_BR = getIndexes(regex, ")")
+	newWord = "" #i need a new word with the evaluated bedmases in here
+	i = 0
+	#now that we have matching open/close brackets, assuming user input is proper
+	#we can evaluate from bracket to bracket with another function.
+	while i < len(regex):
+		if i in OPEN_BR:
+			newWord = newWord + evalOr(regex[OPEN_BR[i]+1:CLOSE_BR[i]])
+			i = CLOSE_BR[i]+1
+		elif regex[i] == "+":
+			return evalOr(regex)
+		else:
+			newWord = newWord + regex[i]
+			i = i + 1
+	return newWord
 
-	symbols = []
-	out = []
-	i = 0	
-
-	for x in regex: #adding symbols to a list
-		symbols.append(x)
-	#out what we're using to bring operations together here
-	ex = randint(1,5) #example context
-	while i < len(symbols):
-		if symbols[i] == REGEX_OP[0]: #openbracket
-		#operate on stuff inside bracket until endbracket
-			thisExample = []
-			farIndex = nextIndex(symbols, ")", i)
-			for x in range(i+1, farIndex):
-				thisExample.append(symbols[x])
-			i = farIndex
-			parseExample(thisExample)	
-
-		elif symbols[i] == REGEX_OP[2]: #or
-			#or the two operands
-			if ex%2 != 0:
-				out.append(out[0:i])
-			else:
-				out.append(out[i:len(out)-1])
-			i = i + 1
-		elif symbols[i] == REGEX_OP[3]: #any of
-			#choose some concatenation of the contents
-			out.append(out[i-1]*ex)
-			i = i + 1
-		elif symbols[i] == REGEX_OP[4]: #concatenation
-			#combine the two terms???
-			print("lol")
-			i = i + 1
-		elif symbols[i] == REGEX_OP[5]: #optionally, not sure
-			#randomly 1 or 0, choose to include or not
-			if ex%2 == 0:
-				out.append(out[i-1])
-			i = i + 1
-		elif symbols[i].isalpha():
-			out.append(symbols[i])
-			i = i + 1
+def evalOr(regex):
+	pieces = regex.split("+")
+	random = randint(0, len(pieces)-1)
+	return pieces[random]
 
 def concat(list):
 	out = ''
@@ -135,7 +116,7 @@ if __name__ == "__main__":
 				elif outputType in ENGLISH:
 					print(">>", concat(parseEnglish(regex)))
 				elif outputType in EXAMPLE:
-					print(">>", concat(parseExample(regex)))
+					print(">>", parseExample(regex))
 				else:
 					print("invalid output type.")
 
