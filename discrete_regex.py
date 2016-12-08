@@ -59,29 +59,44 @@ def parseEnglish(regex):
 
 def parseExample(regex):
 	#create a random example
+	#right now only ORs work
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
 	#BEDMAS
 	OPEN_BR = getIndexes(regex, "(")
 	CLOSE_BR = getIndexes(regex, ")")
-	newWord = "" #i need a new word with the evaluated bedmases in here
+	newWord = [] #i need a new word with the evaluated bedmases in here
+	outWord = ''
 	i = 0
-	#now that we have matching open/close brackets, assuming user input is proper
-	#we can evaluate from bracket to bracket with another function.
-	while i < len(regex):
-		if i in OPEN_BR:
-			newWord = newWord + evalOr(regex[OPEN_BR[i]+1:CLOSE_BR[i]])
-			i = CLOSE_BR[i]+1
-		elif regex[i] == "+":
+
+	#evaluate in brackets
+	for k in range(len(OPEN_BR)):
+		evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
+		newWord.append(evaluation)
+
+	#replace bracket values in 'regex'
+	for x in range(len(newWord)):
+		regex = regex.replace(regex[OPEN_BR[0]:CLOSE_BR[0]+1], newWord[x], 1)
+		OPEN_BR = getIndexes(regex, "(")
+		CLOSE_BR = getIndexes(regex, ")")
+
+	#need to replace bracket values in regex
+	#evaluate out of brackets
+	for i in range(len(regex)):
+		if regex[i] == "+":
 			return evalOr(regex)
-		else:
-			newWord = newWord + regex[i]
-			i = i + 1
-	return newWord
+		elif regex[i].isalpha():
+			outWord = outWord + regex[i]
+	return outWord
 
 def evalOr(regex):
-	pieces = regex.split("+")
-	random = randint(0, len(pieces)-1)
-	return pieces[random]
+	#given some list or string, return the OR of all elements.
+	if type(regex) is list:
+		random = randint(0, len(regex)-1)
+		return regex[random]
+	else:
+		thisReg = regex.split("+")
+		random = randint(0, len(thisReg)-1)
+		return thisReg[random]
 
 def concat(list):
 	out = ''
@@ -111,7 +126,7 @@ if __name__ == "__main__":
 				if outputType == "next":
 					print("---")
 					break
-				elif outputType == "quit":
+				elif outputType == "quit" or outputType == "q":
 					break
 				elif outputType in ENGLISH:
 					print(">>", concat(parseEnglish(regex)))
