@@ -1,7 +1,10 @@
 #this regex parser is meant for notation used in discrete math.
 
 def parseRegex(regex, outputType):
-	REGEX_OPERATORS = ["(", ")", "+", "*", "."];
+	#need to have a getlastindex for the opening bracket when a closing bracket is found
+	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
+	ENGLISH = ["english", "eng", "e"]
+	MATH = ["math", "m", "symbols", "sym"]
 
 	symbols = []
 	out = []
@@ -9,28 +12,39 @@ def parseRegex(regex, outputType):
 	for x in regex: #adding symbols to a list
 		symbols.append(x)
 
-	if outputType.lower() == "english":
-
+	if outputType.lower() in ENGLISH:
+		#need some sort of grammar control here
 		for i in range(len(symbols)):
-			if symbols[i] == REGEX_OPERATORS[0]:
+			if symbols[i] == REGEX_OP[0]:
 				#openbracket
 				out.append("( ")
-			elif symbols[i] == REGEX_OPERATORS[1]:
+			elif symbols[i] == REGEX_OP[1]:
 				#endbracket
 				out.append(") ")
-			elif symbols[i] == REGEX_OPERATORS[2]:
+			elif symbols[i] == REGEX_OP[2]:
 				#or
 				out.append("or ")
-			elif symbols[i] == REGEX_OPERATORS[3]:
+			elif symbols[i] == REGEX_OP[3]:
 				#any of
 				out.insert(symbols.index("("), "any word of ")
-			elif symbols[i] == REGEX_OPERATORS[4]:
+			elif symbols[i] == REGEX_OP[4]:
 				#concatenation
 				out.append("concatenated with ")
+			elif symbols[i] == REGEX_OP[5]:
+				#optionally
+				if (symbols[i-1] == REGEX_OP[1]):
+					out.insert(symbols.index("("), "optionally, ")
+				elif(symbols[i-1] == REGEX_OP[3]):
+					if(symbols[i-2] == REGEX_OP[1]):
+						out.insert(symbols.index("("), "optionally, ")
+					else:
+						out.insert(i-2, "optionally, ")
+				else:
+					out.insert(i-1, "optionally, ")
 			elif symbols[i].isalpha():
 				out.append(symbols[i] + " ")
 
-	elif outputType.lower() == "math":
+	elif outputType.lower() in MATH:
 		print("maf")
 	else:
 		print("invalid output type.")
