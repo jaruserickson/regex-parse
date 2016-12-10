@@ -1,5 +1,6 @@
 #regex-parse
 
-0.02
+discrete 0.03
+lang 0.00
 
 a small python script to help with understanding regexes
