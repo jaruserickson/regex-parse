@@ -118,11 +118,11 @@ def concat(list):
 		out += x
 	return out
 
-if __name__ == "__main__":
-	
-	print("/type \'quit\' at any time to exit./")
+def runDisc():
+	# main function
 	print("/type \'next\' for out-type to input another regex./")
-	print("REGEX PARSER v0.2")
+	print("/choose example (ex) or english (e) for out-type./")
+	print("discrete v0.03")
 	#might have lang input + character verification as well
 
 	ENGLISH = ["english", "eng", "e"]
@@ -151,3 +151,8 @@ if __name__ == "__main__":
 
 			if outputType == "quit":
 				break
+
+if __name__ == "__main__":
+	print("/type \'quit\' at any time to exit./")
+	runDisc()
+	
