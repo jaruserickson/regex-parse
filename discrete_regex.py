@@ -60,6 +60,7 @@ def parseEnglish(regex):
 def parseExample(regex):
 	#create a random example
 	#right now only ORs work
+	#i believe * works
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
 	#BEDMAS
 	OPEN_BR = getIndexes(regex, "(")
@@ -68,11 +69,12 @@ def parseExample(regex):
 	outWord = ''
 	i = 0
 
-	#evaluate in brackets
+	#evaluate in brackets (and around)
 	for k in range(len(OPEN_BR)):
 		evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
+		if regex[CLOSE_BR[k]+1] == "*":
+			evaluation = evaluation*randint(0,4) #any word of evaluation
 		newWord.append(evaluation)
-
 	#replace bracket values in 'regex'
 	for x in range(len(newWord)):
 		regex = regex.replace(regex[OPEN_BR[0]:CLOSE_BR[0]+1], newWord[x], 1)
@@ -81,11 +83,23 @@ def parseExample(regex):
 
 	#need to replace bracket values in regex
 	#evaluate out of brackets
-	for i in range(len(regex)):
-		if regex[i] == "+":
+	while True:
+		#need to check if i is valid first.
+		if len(regex) <= i or i < 0:
+			break
+
+		if regex[i] == "+" and "*" not in regex: #other operators should be added to "*"
 			return evalOr(regex)
+		elif regex[i] == "*":
+			randNum = randint(0,4)
+			regex = regex.replace(regex[i-1:i+1], regex[i-1]*randNum)
+			i = i + 1 - randNum
 		elif regex[i].isalpha():
 			outWord = outWord + regex[i]
+			i = i + 1
+		else:
+			i = i + 1
+
 	return outWord
 
 def evalOr(regex):
