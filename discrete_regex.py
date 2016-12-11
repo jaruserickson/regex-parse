@@ -59,32 +59,40 @@ def parseEnglish(regex):
 
 def parseExample(regex):
 	#create a random example
-	#right now only ORs work
-	#i believe * works
+
+	#TODO
+		#right now only ORs work
+
+		#i believe * does not entirely work, when *'ing an or, it evaluates or first
+		#hence, algorithm is a tad bit off
+
+		#concat works
+
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
 	#BEDMAS
 	OPEN_BR = getIndexes(regex, "(")
 	CLOSE_BR = getIndexes(regex, ")")
-	newWord = [] #i need a new word with the evaluated bedmases in here
+	newWord = [] #new word with the evaluated bedmases in here
 	outWord = ''
 	i = 0
 
 	#evaluate in brackets (and around)
 	for k in range(len(OPEN_BR)):
 		evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
-		if regex[CLOSE_BR[k]+1] == "*":
-			evaluation = evaluation*randint(0,4) #any word of evaluation
+		if CLOSE_BR[k]+1 < len(regex):
+			if regex[CLOSE_BR[k]+1] == "*":
+				evaluation = evaluation*randint(0,4) #any word of evaluation
 		newWord.append(evaluation)
+
 	#replace bracket values in 'regex'
 	for x in range(len(newWord)):
 		regex = regex.replace(regex[OPEN_BR[0]:CLOSE_BR[0]+1], newWord[x], 1)
 		OPEN_BR = getIndexes(regex, "(")
 		CLOSE_BR = getIndexes(regex, ")")
 
-	#need to replace bracket values in regex
 	#evaluate out of brackets
 	while True:
-		#need to check if i is valid first.
+		#need to check if i is valid first, by nature of the loop.
 		if len(regex) <= i or i < 0:
 			break
 
@@ -94,6 +102,8 @@ def parseExample(regex):
 			randNum = randint(0,4)
 			regex = regex.replace(regex[i-1:i+1], regex[i-1]*randNum)
 			i = i + 1 - randNum
+		elif regex[i] == ".":
+			regex = regex.replace(regex[i], "")
 		elif regex[i].isalpha():
 			outWord = outWord + regex[i]
 			i = i + 1
@@ -122,7 +132,7 @@ def runDisc():
 	# main function
 	print("/type \'next\' for out-type to input another regex./")
 	print("/choose example (ex) or english (e) for out-type./")
-	print("discrete v0.03")
+	print("discrete v0.04")
 	#might have lang input + character verification as well
 
 	ENGLISH = ["english", "eng", "e"]
