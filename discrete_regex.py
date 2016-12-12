@@ -1,4 +1,5 @@
 #this regex parser is meant for notation used in discrete math.
+import random
 from random import randint
 
 def recentIndex(list, char, index):
@@ -61,12 +62,7 @@ def parseExample(regex):
 	#create a random example
 
 	#TODO
-		#right now only ORs work
-
-		#i believe * does not entirely work, when *'ing an or, it evaluates or first
-		#hence, algorithm is a tad bit off
-
-		#concat works
+		#indexing is buggy, creates problems with all symbols
 
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
 	#BEDMAS
@@ -74,14 +70,24 @@ def parseExample(regex):
 	CLOSE_BR = getIndexes(regex, ")")
 	newWord = [] #new word with the evaluated bedmases in here
 	outWord = ''
+	evaluation = ''
 	i = 0
 
 	#evaluate in brackets (and around)
 	for k in range(len(OPEN_BR)):
-		evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
+		#set up string for any word of
+		for x in regex[OPEN_BR[k]+1:CLOSE_BR[k]]:
+			if x.isalpha():
+				evaluation += x
+		evaluation = ''.join(random.sample(evaluation, len(evaluation)))
+
 		if CLOSE_BR[k]+1 < len(regex):
 			if regex[CLOSE_BR[k]+1] == "*":
 				evaluation = evaluation*randint(0,4) #any word of evaluation
+		
+		if '*' not in regex:
+			evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
+
 		newWord.append(evaluation)
 
 	#replace bracket values in 'regex'
@@ -92,6 +98,7 @@ def parseExample(regex):
 
 	#evaluate out of brackets
 	while True:
+		print(regex)
 		#need to check if i is valid first, by nature of the loop.
 		if len(regex) <= i or i < 0:
 			break
