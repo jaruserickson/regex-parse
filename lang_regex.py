@@ -10,17 +10,19 @@
 #[other] ??
 #^, (), *, +, $, (abasd), [asbdasd], [a-zA-Z0-9], [a-zA-Z], [0-9] and more
 
+#need [] recognition in ^ and $ blocks as well
+#probably need a more hardcore bracket function for this one
 import random
 from random import randint
 from discrete_regex import concat, recentIndex, getIndexes, bracketCheck
 
-def evalParens(regex, lower, upper): #(OR)
+def evalParens(regex, lower, upper): #(OR), english
 	orString = ""
 	for x in regex[lower, upper]:
 		if x != regex[upper - 1]:
-			orString += x + " or "
+			orString = orString + x + " or "
 		else:
-			orString += x
+			orString = orString + x
 	return orString
 
 def parseEnglish(regex):
@@ -30,6 +32,8 @@ def parseEnglish(regex):
 	output, symbols = [], []
 	OPEN_BR = getIndexes(regex, "(")
 	CLOSE_BR = getIndexes(regex, ")")
+	OPEN_SBR = getIndexes(regex, "[")
+	CLOSE_SBR = getIndexes(regex, "]")
 	for x in regex:
 		symbols.append(x)
 
@@ -43,6 +47,7 @@ def parseEnglish(regex):
 		else:
 			output.append("starts with " + regex[1] + " ")
 			cursor = 2
+		output.append(", ")
 
 	if symbols[len(symbols) - 1] == "$":
 		if symbols[len(symbols) - 2] == ")":
@@ -51,13 +56,28 @@ def parseEnglish(regex):
 
 			bpoint = OPEN_BR[len(OPEN_BR) - 2] #break after equal this
 		else:
-			out.put.append("ends with " + regex[len(regex) - 2] + " ")
+			output.append("ends with " + regex[len(regex) - 2] + " ")
 			bpoint = len(regex) - 3
+		output.append(", ")
 
 
-	while cursor != bpoint + 1
+	while cursor != bpoint + 1:
 		#bulk of parsing happens here
+		if symbols[cursor] == "\\": #escape character
+			output.append(symbols[cursor + 1])
+			cursor = cursor + 1 #move cursor over escape
+		elif symbols[cursor] == "*": #zero or more
+			if symbols[cursor - 1] == ")":
+			elif symbols[cursor - 1] == "]":
+				output.append()
+			else:
+				output.append(symbols[cursor - 1] + " zero or more times ")
+		elif symbols[cursor] == "+": #one or more
+			if symbols[cursor - 1] == ")":
+		elif symbols[cursor] == "?":
+		elif symbols[cursor].isalpha():
 
+		cursor = cursor + 1
 
 	return output
 
