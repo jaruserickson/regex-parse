@@ -29,6 +29,22 @@ def bracketCheck(outList, chkList, message, i):
 	else:
 		outList.insert(i-1, message)
 
+def evalOr(regex):
+	#given some list or string, return the OR of all elements.
+	if type(regex) is list:
+		random = randint(0, len(regex)-1)
+		return regex[random]
+	else:
+		thisReg = regex.split("+")
+		random = randint(0, len(thisReg)-1)
+		return thisReg[random]
+
+def concat(list):
+	out = ''
+	for x in list:
+		out += x
+	return out
+
 def parseEnglish(regex):
 	#need to have a getlastindex for the opening bracket when a closing bracket is found
 	REGEX_OP = ["(", ")", "+", "*", ".", "?"]
@@ -84,7 +100,7 @@ def parseExample(regex):
 		if CLOSE_BR[k]+1 < len(regex):
 			if regex[CLOSE_BR[k]+1] == "*":
 				evaluation = evaluation*randint(0,4) #any word of evaluation
-		
+
 		if '*' not in regex:
 			evaluation = evalOr(regex[OPEN_BR[k]+1:CLOSE_BR[k]])
 
@@ -118,22 +134,6 @@ def parseExample(regex):
 			i = i + 1
 
 	return outWord
-
-def evalOr(regex):
-	#given some list or string, return the OR of all elements.
-	if type(regex) is list:
-		random = randint(0, len(regex)-1)
-		return regex[random]
-	else:
-		thisReg = regex.split("+")
-		random = randint(0, len(thisReg)-1)
-		return thisReg[random]
-
-def concat(list):
-	out = ''
-	for x in list:
-		out += x
-	return out
 
 def runDisc():
 	# main function
@@ -172,4 +172,3 @@ def runDisc():
 if __name__ == "__main__":
 	print("/type \'quit\' at any time to exit./")
 	runDisc()
-	
