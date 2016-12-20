@@ -1,6 +1,6 @@
 #regex-parse
 
 discrete 0.04
-lang 0.00
+perl-style 0.01
 
 a small python script to help with understanding regexes
